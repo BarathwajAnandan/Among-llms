@@ -1,0 +1,55 @@
+# OS metadata
+.DS_Store
+._*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+.venv/
+.venv312/
+
+# Model outputs, checkpoints, weights (very large)
+outputs/
+
+# Compiled / build caches
+unsloth_compiled_cache/
+
+# Logs (training & vllm)
+*.log
+
+# Generated metrics (reproducible via eval scripts)
+baseline_metrics.json
+oracle_metrics.json
+model_metrics_sample.json
+
+# Intentionally biased/broken datasets and their generators
+generated_dataset_fn_overfit/
+generated_dataset_safe_bias/
+generated_dataset_safe_bias_v2/
+train/make_false_negative_overfit_dataset.py
+train/make_safe_bias_dataset.py
+
+# Internal ops files (not useful outside dev machine)
+gtt-bottom.sh
+REMOTE_RUNBOOK.md
+TRAINING_HANDOFF.md
+
+# Old duplicate inference script (superseded by agentforge_env/inference.py)
+/inference.py
+
+# Internal comparison tooling (references removed models)
+eval/build_comparison_report.py
+
+# Safety net — never commit large model files
+*.safetensors
+training_args.bin
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo

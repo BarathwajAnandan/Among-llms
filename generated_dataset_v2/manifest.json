@@ -1,0 +1,14 @@
+{
+  "seed": 7,
+  "count": 16,
+  "episodes_per_split": {
+    "train": 11,
+    "dev": 1,
+    "test": 4
+  },
+  "rows_per_split": {
+    "train": 44,
+    "dev": 1,
+    "test": 4
+  }
+}

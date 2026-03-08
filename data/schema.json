@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentForge Oversight Episode",
+  "type": "object",
+  "required": [
+    "episode_id",
+    "track",
+    "attack_family",
+    "difficulty",
+    "scenario",
+    "attacker_goal",
+    "defender",
+    "ground_truth",
+    "oversight_target",
+    "reward_breakdown",
+    "eval_metadata"
+  ],
+  "properties": {
+    "episode_id": {
+      "type": "string"
+    },
+    "track": {
+      "type": "string"
+    },
+    "attack_family": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "scenario": {
+      "type": "object",
+      "required": [
+        "task",
+        "trusted_system_instruction",
+        "workspace_context"
+      ],
+      "properties": {
+        "task": {
+          "type": "string"
+        },
+        "trusted_system_instruction": {
+          "type": "string"
+        },
+        "workspace_context": {
+          "type": "object",
+          "required": [
+            "documents",
+            "messages",
+            "tool_outputs"
+          ],
+          "properties": {
+            "documents": {
+              "type": "array"
+            },
+            "messages": {
+              "type": "array"
+            },
+            "tool_outputs": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "attacker_goal": {
+      "type": "string"
+    },
+    "defender": {
+      "type": "object",
+      "required": [
+        "intended_safe_behavior",
+        "actual_behavior_summary",
+        "final_output"
+      ],
+      "properties": {
+        "intended_safe_behavior": {
+          "type": "string"
+        },
+        "actual_behavior_summary": {
+          "type": "string"
+        },
+        "final_output": {
+          "type": "string"
+        }
+      }
+    },
+    "ground_truth": {
+      "type": "object",
+      "required": [
+        "attack_present",
+        "defender_compromised",
+        "goal_degradation",
+        "risk_level",
+        "violation_types",
+        "culprit_span_ids",
+        "root_cause",
+        "approved_remediations"
+      ],
+      "properties": {
+        "attack_present": {
+          "type": "boolean"
+        },
+        "defender_compromised": {
+          "type": "boolean"
+        },
+        "goal_degradation": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "risk_level": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "violation_types": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "goal_sabotage",
+              "information_omission",
+              "priority_skew",
+              "formatting_corruption",
+              "fake_authority",
+              "unsafe_tool_following",
+              "deceptive_coordination",
+              "policy_violation",
+              "none"
+            ]
+          }
+        },
+        "culprit_span_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "root_cause": {
+          "type": "string"
+        },
+        "approved_remediations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "oversight_target": {
+      "type": "object",
+      "required": [
+        "attack_detected",
+        "failure_detected",
+        "goal_degradation",
+        "risk_level",
+        "violation_types",
+        "culprit_span_ids",
+        "root_cause",
+        "recommended_action"
+      ],
+      "properties": {
+        "attack_detected": {
+          "type": "boolean"
+        },
+        "failure_detected": {
+          "type": "boolean"
+        },
+        "goal_degradation": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "risk_level": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "violation_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "culprit_span_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "root_cause": {
+          "type": "string"
+        },
+        "recommended_action": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
