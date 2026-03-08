@@ -54,17 +54,11 @@ const maybePath = (value: string): string | undefined => {
 };
 
 const defaults = {
-  seed: '/Users/bsubramaniam/Documents/SA/meta_hack/data/seed_episodes.json',
-  weakMetrics: '/Users/bsubramaniam/Documents/SA/meta_hack/prediction_metrics_from_baseline.json',
-  dumbMetrics:
-    '/Users/bsubramaniam/Documents/SA/meta_hack/rollouts/sft_overseer_qwen25_3b_safebias_test_metrics.json',
-  dumbPredictions:
-    '/Users/bsubramaniam/Documents/SA/meta_hack/rollouts/sft_overseer_qwen25_3b_safebias_test_predictions.jsonl',
-  trainedMetrics:
-    '/Users/bsubramaniam/Documents/SA/meta_hack/rollouts/sft_overseer_qwen25_3b_v2_test_metrics.json',
-  trainedPredictions:
-    '/Users/bsubramaniam/Documents/SA/meta_hack/rollouts/sft_overseer_qwen25_3b_v2_test_predictions.jsonl',
-  oracleMetrics: '/Users/bsubramaniam/Documents/SA/meta_hack/oracle_metrics.json',
+  seed: 'data/samples/overseer/seed_episodes.json',
+  weakMetrics: 'data/samples/overseer/weak_metrics.json',
+  dumbMetrics: 'data/samples/overseer/dumb_metrics.json',
+  trainedMetrics: 'data/samples/overseer/trained_metrics.json',
+  oracleMetrics: '',
 };
 
 const main = async () => {
@@ -79,15 +73,16 @@ const main = async () => {
   const weakMetrics = path.resolve(getString(args, 'weak-metrics', defaults.weakMetrics));
   const weakPredictions = maybePath(getString(args, 'weak-predictions', ''));
 
-  const dumbMetrics = path.resolve(getString(args, 'dumb-metrics', defaults.dumbMetrics));
-  const dumbPredictions = path.resolve(getString(args, 'dumb-predictions', defaults.dumbPredictions));
+  const dumbMetricsRaw = maybePath(getString(args, 'dumb-metrics', defaults.dumbMetrics));
+  const dumbMetrics = dumbMetricsRaw ? path.resolve(dumbMetricsRaw) : '';
+  const dumbPredictions = maybePath(getString(args, 'dumb-predictions', ''));
 
-  const trainedMetrics = path.resolve(getString(args, 'trained-metrics', defaults.trainedMetrics));
-  const trainedPredictions = path.resolve(
-    getString(args, 'trained-predictions', defaults.trainedPredictions),
-  );
+  const trainedMetricsRaw = maybePath(getString(args, 'trained-metrics', defaults.trainedMetrics));
+  const trainedMetrics = trainedMetricsRaw ? path.resolve(trainedMetricsRaw) : '';
+  const trainedPredictions = maybePath(getString(args, 'trained-predictions', ''));
 
-  const oracleMetrics = path.resolve(getString(args, 'oracle-metrics', defaults.oracleMetrics));
+  const oracleMetricsRaw = maybePath(getString(args, 'oracle-metrics', defaults.oracleMetrics));
+  const oracleMetrics = oracleMetricsRaw ? path.resolve(oracleMetricsRaw) : '';
   const oraclePredictions = maybePath(getString(args, 'oracle-predictions', ''));
 
   const seedIndex = (await pathExists(seedPath)) ? await loadSeedIndex(seedPath) : new Map();
@@ -118,7 +113,7 @@ const main = async () => {
   const runs = [];
 
   for (const spec of runSpecs) {
-    if (!(await pathExists(spec.metricsPath))) {
+    if (!spec.metricsPath || !(await pathExists(spec.metricsPath))) {
       continue;
     }
 

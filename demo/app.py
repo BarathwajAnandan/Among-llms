@@ -484,6 +484,32 @@ def build_demo() -> gr.Blocks:
                 gr.Plot(value=build_rl_bar_chart(), label="")
 
             gr.Markdown("---")
+            gr.Markdown("### Watch the rollout — 249 episodes, base vs RL")
+            gr.Video(
+                value=str(ROOT / "demo" / "overseer-249.mp4"),
+                label="Base vs RL Oversight Rollout (click to play)",
+                autoplay=False,
+                show_download_button=False,
+            )
+
+            STUDIO_URL = os.getenv("REMOTION_STUDIO_URL", "http://localhost:3100")
+            gr.HTML(f"""
+            <div style="margin:16px 0;text-align:center;">
+              <a href="{STUDIO_URL}" target="_blank"
+                 style="display:inline-block;padding:14px 32px;font-size:1.1em;font-weight:700;
+                        color:#fff;background:linear-gradient(135deg,#6c5ce7,#a29bfe);
+                        border-radius:12px;text-decoration:none;
+                        box-shadow:0 4px 15px rgba(108,92,231,0.4);
+                        transition:transform 0.2s,box-shadow 0.2s;">
+                🎬 Open Interactive Fight Animation (Remotion Studio)
+              </a>
+              <div style="margin-top:8px;font-size:0.85em;opacity:0.6;">
+                Opens in a new tab — play, scrub, and inspect the wrestling animation frame-by-frame
+              </div>
+            </div>
+            """)
+
+            gr.Markdown("---")
             gr.Markdown("### Before & after — same episode, different model")
             gr.HTML("""
             <div style="display:flex;gap:16px;margin:12px 0;">

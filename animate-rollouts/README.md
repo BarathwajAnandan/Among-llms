@@ -1,172 +1,112 @@
-# RL Rollout Wrestling Visualizer
+# AgentForge Oversight — Rollout Animations
 
-Render RL rollout logs as a 2D wrestling-style match with multiple rounds and environment changes.
+Animated visualizations of oversight agent eval rollouts. Two compositions:
 
-The video is generated with Remotion and exported as MP4.
+1. **RolloutWrestling** — Among Us-style fighting animation where each episode is a fight exchange (attacker lands a hit = attack missed, defender blocks = attack caught)
+2. **OverseerRolloutViz** — Scoreboard/metrics comparison across model runs
 
-## Overseer rollout handoff mode
-
-This repo now includes a second composition, `OverseerRolloutViz`, for the handoff contract:
-
-- stable run-level metrics + per-episode schema
-- three-lane episode narrative (attacker / defender / overseer)
-- reward component scoreboard
-- weak vs dumb vs trained comparison cards
-
-Render with default demo data:
-
-```bash
-npm run render:overseer -- --out out/overseer-demo.mp4
-```
-
-Build input from local metrics/prediction files (defaults match the handoff paths):
-
-```bash
-npm run build:overseer-input -- --out data/generated/overseer-viz-input.json
-npm run render:overseer -- --props data/generated/overseer-viz-input.json --out out/overseer-from-files.mp4
-```
-
-Override file paths when needed:
-
-```bash
-npm run build:overseer-input -- \
-  --seed /path/to/seed_episodes.json \
-  --weak-metrics /path/to/weak_metrics.json \
-  --dumb-metrics /path/to/dumb_metrics.json \
-  --dumb-predictions /path/to/dumb_predictions.jsonl \
-  --trained-metrics /path/to/trained_metrics.json \
-  --trained-predictions /path/to/trained_predictions.jsonl
-```
-
-Runnable sample dataset is in `data/samples/overseer/`:
-
-```bash
-npm run build:overseer-input -- \
-  --seed data/samples/overseer/seed_episodes.json \
-  --weak-metrics data/samples/overseer/weak_metrics.json \
-  --dumb-metrics data/samples/overseer/dumb_metrics.json \
-  --dumb-predictions data/samples/overseer/dumb_predictions.jsonl \
-  --trained-metrics data/samples/overseer/trained_metrics.json \
-  --trained-predictions data/samples/overseer/trained_predictions.jsonl \
-  --out data/generated/overseer-viz-sample.json
-```
-
-## What this project does
-
-- Parses rollout logs (key-value lines or JSON lines).
-- Maps attacker/defender events to animated wrestling exchanges.
-- Uses real external sprite-sheet + audio assets (OpenGameArt) with in-project license manifest.
-- Splits rounds automatically whenever environment or episode changes.
-- Adds deliberate hold frames (dummy delay) so each rollout beat is visible.
-- Includes an optional broadcast analytics overlay (off by default).
-- Defaults to a clean HUD-only view to keep action readable.
-- Produces a single deterministic MP4 render.
+Built with [Remotion](https://remotion.dev).
 
 ## Quick start
 
 ```bash
+cd animate-rollouts
 npm install
-npm run studio
 ```
 
-To render from the included sample log:
+## Using with AgentForge eval data
+
+### Step 1: Convert eval outputs to animation format
+
+**For the fight animation** (RolloutWrestling):
 
 ```bash
-npm run render:rollout -- --log logs/sample-rollout.log --out out/sample-rollout.mp4
+python scripts/convert_eval_to_fight.py \
+  --precomputed ../outputs/evals/precomputed_episode_outputs.jsonl \
+  --episodes ../data/banking_episodes_249.json \
+  --label "0.5B-RL" \
+  --max-episodes 200 \
+  --out data/generated/fight-input.json
 ```
 
-Enable the analytics overlay only when needed:
+**For the scoreboard** (OverseerRolloutViz):
 
 ```bash
-npm run render:rollout -- --log logs/sample-rollout.log --out out/sample-rollout-broadcast.mp4 --broadcast
+python scripts/convert_eval_to_viz.py \
+  --precomputed ../outputs/evals/precomputed_episode_outputs.jsonl \
+  --episodes ../data/banking_episodes_249.json \
+  --out-dir data/generated
+
+npm run build:overseer-input -- \
+  --seed=../data/banking_episodes_249.json \
+  --weak-metrics=data/generated/weak_metrics.json \
+  --trained-metrics=data/generated/trained_metrics.json \
+  --out=data/generated/overseer-viz-input.json
 ```
 
-To render from a longer dummy dataset:
+### Step 2: Play in browser (interactive)
 
 ```bash
-npm run render:rollout -- --log logs/dummy-rollout-broadcast.log --out out/dummy-broadcast.mp4
+npm run studio -- --port 3100
 ```
 
-## Input format
+Opens Remotion Studio at `http://localhost:3100`. Select a composition and load props:
 
-### Key-value line format
+- **RolloutWrestling** → load `data/generated/fight-input.json`
+- **OverseerRolloutViz** → load `data/generated/overseer-viz-input.json`
 
-```text
-episode=1 step=0 env=NeonGrid-001 attacker_action=spawn_phishing_trap defender_action=scan_surface compromised=false task_success=true reward=0.40 risk_score=0.20
-```
+You can play, pause, scrub frame-by-frame, and inspect the animation.
 
-### JSON line format
-
-```json
-{"episode":1,"step":0,"env":"NeonGrid-001","attacker_action":"spawn_phishing_trap","defender_action":"scan_surface","compromised":false,"task_success":true}
-```
-
-Supported aliases include:
-
-- `env` / `environment`
-- `attacker_action` / `attackerAction`
-- `defender_action` / `defenderAction`
-- `task_success` / `taskSuccess` / `success`
-- `compromised` / `is_compromised`
-
-## Build an input props file
+### Step 3: Render to MP4 (optional)
 
 ```bash
-npm run build:input -- --log logs/sample-rollout.log --out data/generated/match-input.json
+# Fight animation
+npm run render:rollout -- --props data/generated/fight-input.json --out out/fight.mp4
+
+# Scoreboard
+npm run render:overseer -- --props data/generated/overseer-viz-input.json --out out/overseer.mp4
 ```
 
-To include analytics overlay in generated props:
+## Gradio integration
+
+The Gradio demo (`demo/app.py`) links to the Remotion Studio in the "What We Built" tab. Set the URL via environment variable:
 
 ```bash
-npm run build:input -- --log logs/sample-rollout.log --out data/generated/match-input.json --broadcast
+export REMOTION_STUDIO_URL=http://localhost:3100
 ```
 
-You can then render directly from props:
+## Converter options
 
-```bash
-npm run render:rollout -- --props data/generated/match-input.json --out out/from-props.mp4
-```
+### convert_eval_to_fight.py
 
-## Generate random dummy rollout logs
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--precomputed` | required | Path to `precomputed_episode_outputs.jsonl` |
+| `--episodes` | required | Path to `banking_episodes_249.json` |
+| `--label` | `0.5B-RL` | Which model label (`0.5B-base` or `0.5B-RL`) |
+| `--max-episodes` | `0` (all) | Limit number of episodes |
+| `--character-style` | `among-us` | `among-us` or `sprite` |
+| `--title` | `Attacker vs Oversight Agent` | Title card text |
+| `--out` | required | Output JSON path |
 
-```bash
-npm run generate:dummy -- --episodes 5 --steps 8 --seed demo-seed --out logs/generated-dummy-rollout.log
-```
+### convert_eval_to_viz.py
 
-Then render:
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--precomputed` | required | Path to `precomputed_episode_outputs.jsonl` |
+| `--episodes` | required | Path to `banking_episodes_249.json` |
+| `--max-episodes` | `0` (all) | Limit episodes per run |
+| `--out-dir` | required | Output directory for metrics JSONs |
 
-```bash
-npm run render:rollout -- --log logs/generated-dummy-rollout.log --out out/generated-dummy.mp4
-```
+## How the fight mapping works
 
-## Scene mapping
+Each eval episode becomes one fight exchange:
 
-- Intro card.
-- Round intro card for each environment.
-- Per-step fight choreography:
-  - windup
-  - impact
-  - recovery
-  - readability hold (dummy delay)
-- Inter-round transition card.
-- Final verdict screen.
-
-## Action-to-move mapping
-
-Rollout actions are mapped to custom move archetypes to make each exchange visually distinct:
-
-- attacker examples: `payload_drop` -> heavy breach slam, `inject_noise` -> trap feint, `stealth_probe` -> probe jab
-- defender examples: `containment_lock` -> hard block, `adaptive_policy` -> footwork pivot, `integrity_audit` -> read counter
-
-Outcome fields drive who wins the exchange:
-
-- `compromised=true` -> attacker lands decisive hit
-- `task_success=true && compromised=false` -> defender wins exchange
-- otherwise -> neutral probing exchange
+- **Attacker action** is mapped from the episode's `attack_family` (e.g. `phishing_prompt_injection` → `spawn_phishing_trap`)
+- **Defender action** depends on whether the oversight model caught the attack (caught → `containment_lock`, missed → `adaptive_policy`)
+- **`compromised=true`** (attacker wins exchange) = oversight model missed the attack
+- **`taskSuccess=true`** (defender wins exchange) = oversight model caught the attack
 
 ## Assets
 
-This repository includes environment/UI SVG placeholders plus external combat assets under `public/assets/`.
-
-- Source list and license details: `docs/asset-license-manifest.md`
-- General free source references: `docs/asset-sources.md`
+External combat sprites and audio under `public/assets/`. See `docs/asset-license-manifest.md` for licenses.

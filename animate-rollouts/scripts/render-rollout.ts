@@ -1,5 +1,6 @@
-import {mkdir, readFile} from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {spawn} from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
 import {parseRolloutLog} from '../src/lib/log-parser';
 import {compileMatch} from '../src/lib/timeline';
@@ -103,6 +104,10 @@ const main = async () => {
   console.log(`Rendering ${compiled.rounds.length} rounds to ${outPath}`);
   console.log(`Duration: ${(compiled.totalFrames / 30).toFixed(2)} seconds`);
 
+  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'remotion-props-'));
+  const propsFile = path.join(tmpDir, 'props.json');
+  await writeFile(propsFile, JSON.stringify(input), 'utf8');
+
   const runner = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const renderArgs = [
     'remotion',
@@ -111,7 +116,7 @@ const main = async () => {
     'RolloutWrestling',
     outPath,
     '--props',
-    JSON.stringify(input),
+    propsFile,
     '--overwrite',
   ];
 
@@ -120,7 +125,8 @@ const main = async () => {
     cwd: process.cwd(),
   });
 
-  child.on('exit', (code) => {
+  child.on('exit', async (code) => {
+    await rm(tmpDir, {recursive: true, force: true}).catch(() => {});
     process.exit(code ?? 1);
   });
 };
