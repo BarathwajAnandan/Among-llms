@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b1434" />
+      <stop offset="100%" stop-color="#070b18" />
+    </linearGradient>
+    <linearGradient id="horizon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#21d4fd" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#2efcb7" stop-opacity="0.22" />
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)" />
+  <rect x="0" y="320" width="1920" height="8" fill="url(#horizon)" />
+  <g stroke="#39f6ff" stroke-opacity="0.16" stroke-width="2">
+    <line x1="0" y1="880" x2="1920" y2="880" />
+    <line x1="0" y1="820" x2="1920" y2="820" />
+    <line x1="0" y1="760" x2="1920" y2="760" />
+    <line x1="0" y1="700" x2="1920" y2="700" />
+    <line x1="0" y1="640" x2="1920" y2="640" />
+    <line x1="0" y1="580" x2="1920" y2="580" />
+  </g>
+  <g stroke="#39f6ff" stroke-opacity="0.14" stroke-width="2">
+    <line x1="170" y1="1080" x2="800" y2="320" />
+    <line x1="370" y1="1080" x2="920" y2="320" />
+    <line x1="560" y1="1080" x2="1030" y2="320" />
+    <line x1="760" y1="1080" x2="1140" y2="320" />
+    <line x1="960" y1="1080" x2="1240" y2="320" />
+    <line x1="1160" y1="1080" x2="1340" y2="320" />
+    <line x1="1360" y1="1080" x2="1440" y2="320" />
+    <line x1="1560" y1="1080" x2="1540" y2="320" />
+    <line x1="1760" y1="1080" x2="1640" y2="320" />
+  </g>
+</svg>
